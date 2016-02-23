@@ -3,7 +3,7 @@
 Package.describe({
   name: "aldeed:collection2-core",
   summary: "Core package for aldeed:collection2",
-  version: "1.0.0",
+  version: "1.1.0",
   git: "https://github.com/aldeed/meteor-collection2-core.git"
 });
 
