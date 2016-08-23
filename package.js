@@ -3,13 +3,12 @@
 Package.describe({
   name: "aldeed:collection2-core",
   summary: "Core package for aldeed:collection2",
-  version: "1.1.1",
+  version: "1.2.0",
   git: "https://github.com/aldeed/meteor-collection2-core.git"
 });
 
 Package.onUse(function(api) {
-
-  api.use('aldeed:simple-schema@1.5.3');
+  api.use('aldeed:simple-schema@1.5.3 || 2.0.0-rc.1 || 2.0.0');
   api.imply('aldeed:simple-schema');
 
   api.use('underscore@1.0.0');

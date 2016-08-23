@@ -1,5 +1,9 @@
 ## Change Log
 
+### 1.2.0
+
+Support for SimpleSchema 2.0
+
 ### 1.1.1
 
 - Fix merging of identical selector schemas (thanks @spencern)
