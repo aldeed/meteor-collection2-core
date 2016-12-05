@@ -1,13 +1,15 @@
+import { EventEmitter } from 'meteor/raix:eventemitter';
+import { Meteor } from 'meteor/meteor';
+import { EJSON } from 'meteor/ejson';
+import { _ } from 'meteor/underscore';
+import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions';
+
+checkNpmVersions({ 'simpl-schema': '0.x.x' }, 'aldeed:meteor-collection2-core');
+
+const SimpleSchema = require('simpl-schema').default;
+
 // Exported only for listening to events
-Collection2 = new EventEmitter();
-
-// backwards compatibility
-if (typeof Mongo === "undefined") {
-  Mongo = {};
-  Mongo.Collection = Meteor.Collection;
-}
-
-var addValidationErrorsPropName = SimpleSchema.version >= 2 ? 'addValidationErrors' : 'addInvalidKeys';
+const Collection2 = new EventEmitter();
 
 /**
  * Mongo.Collection.prototype.attachSchema
@@ -442,7 +444,7 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
 
 function getErrorObject(context) {
   var message;
-  var invalidKeys = SimpleSchema.version >= 2 ? context.validationErrors() : context.invalidKeys();
+  var invalidKeys = (typeof context.validationErrors === 'function') ? context.validationErrors() : context.invalidKeys();
   if (invalidKeys.length) {
     message = context.keyErrorMessage(invalidKeys[0].name);
   } else {
@@ -463,6 +465,7 @@ function addUniqueError(context, errorMessage) {
   var name = errorMessage.split('c2_')[1].split(' ')[0];
   var val = errorMessage.split('dup key:')[1].split('"')[1];
 
+  var addValidationErrorsPropName = (typeof context.addValidationErrors === 'function') ? 'addValidationErrors' : 'addInvalidKeys';
   context[addValidationErrorsPropName]([{
     name: name,
     type: 'notUnique',
@@ -484,6 +487,7 @@ function wrapCallbackForParsingMongoValidationErrors(validationContext, cb) {
 }
 
 function wrapCallbackForParsingServerErrors(validationContext, cb) {
+  var addValidationErrorsPropName = (typeof validationContext.addValidationErrors === 'function') ? 'addValidationErrors' : 'addInvalidKeys';
   return function wrappedCallbackForParsingServerErrors(error) {
     var args = _.toArray(arguments);
     // Handle our own validation errors
@@ -665,3 +669,5 @@ function defineDeny(c, options) {
     alreadyDefined[c._name] = true;
   }
 }
+
+export default Collection2;

@@ -2,3 +2,4 @@
 .build*
 .npm*
 .meteor*
+node_modules

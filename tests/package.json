@@ -1,0 +1,13 @@
+{
+  "name": "tests",
+  "private": true,
+  "scripts": {
+    "test": "METEOR_PACKAGE_DIRS=../package meteor test --once --driver-package dispatch:mocha-phantomjs",
+    "test:watch": "METEOR_PACKAGE_DIRS=../package TEST_WATCH=1 meteor test --driver-package dispatch:mocha-phantomjs"
+  },
+  "dependencies": {
+    "expect": "1.20.2",
+    "meteor-node-stubs": "0.2.4",
+    "simpl-schema": "0.0.3"
+  }
+}
