@@ -54,6 +54,12 @@ const booksSchema = new SimpleSchema({
 const books = new Mongo.Collection('books');
 books.attachSchema(booksSchema);
 
+const upsertTest = new Mongo.Collection('upsertTest');
+upsertTest.attachSchema(new SimpleSchema({
+  _id: {type: String},
+  foo: {type: Number}
+}));
+
 export default function addBooksTests() {
   describe('insert', function () {
     beforeEach(function () {
@@ -372,7 +378,7 @@ export default function addBooksTests() {
 
     it('everything filtered out', function () {
       expect(function () {
-        upsertTest.update({_id: upsertTestId}, {
+        upsertTest.update({_id: '123'}, {
           $set: {
             boo: 1
           }
@@ -381,12 +387,6 @@ export default function addBooksTests() {
     });
 
     it('upsert works with schema that allows _id', function () {
-      const upsertTest = new Mongo.Collection('upsertTest');
-      upsertTest.attachSchema(new SimpleSchema({
-        _id: {type: String},
-        foo: {type: Number}
-      }));
-
       upsertTest.remove({});
 
       const upsertTestId = upsertTest.insert({foo: 1});
