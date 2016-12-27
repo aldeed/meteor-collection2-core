@@ -1,5 +1,12 @@
 language: node_js
-node_js:
-  - "0.10"
-before_install:
-  - "curl -L http://git.io/ejPSng | /bin/sh"
+# Will use version from .nvmrc
+
+cache:
+  directories:
+    - $HOME/.npm
+
+install:
+  - cd tests && npm install
+
+script:
+  - cd tests && npm test

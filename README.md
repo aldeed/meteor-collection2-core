@@ -1,8 +1,10 @@
+[![Build Status](https://travis-ci.org/aldeed/meteor-collection2-core.svg?branch=master)](https://travis-ci.org/aldeed/meteor-collection2-core)
+
 # aldeed:collection2-core
 
 A Meteor package that allows you to attach a schema to a Mongo.Collection. Automatically validates against that schema when inserting and updating from client or server code.
 
-This package requires and automatically installs the [aldeed:simple-schema](https://github.com/aldeed/meteor-simple-schema) package, which defines the schema syntax and provides the validation logic.
+This package requires the [simpl-schema](https://github.com/aldeed/node-simple-schema) NPM package, which defines the schema syntax and provides the validation logic.
 
 ## Installation
 
@@ -10,6 +12,7 @@ In your Meteor app directory, enter:
 
 ```
 $ meteor add aldeed:collection2-core
+$ meteor npm install --save simpl-schema
 ```
 
 ## Why Use Collection2?
@@ -284,7 +287,7 @@ to figure out a more specific schema.
 ## Schema Format
 
 Refer to the
-[simple-schema](https://github.com/aldeed/meteor-simple-schema) package
+[simpl-schema](https://github.com/aldeed/node-simple-schema) package
 documentation for a list of all the available schema rules and validation
 methods.
 
@@ -350,7 +353,7 @@ Books.simpleSchema().namedContext("insertForm").validate({title: "Ulysses", auth
 Books.simpleSchema().namedContext("insertForm").validate({title: "Ulysses", author: "James Joyce"}, {modifier: false, keys: ['title']});
 ```
 
-Refer to the [simple-schema](https://github.com/aldeed/meteor-simple-schema) package documentation for more information about these methods.
+Refer to the [simpl-schema](https://github.com/aldeed/node-simple-schema) package documentation for more information about these methods.
 
 ## Inserting or Updating Without Validating
 
