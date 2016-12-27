@@ -6,6 +6,7 @@ cache:
     - $HOME/.npm
 
 install:
+  - curl https://install.meteor.com/ | sh
   - cd tests && npm install
 
 script:
