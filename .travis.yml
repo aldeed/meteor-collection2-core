@@ -9,4 +9,4 @@ install:
   - cd tests && npm install
 
 script:
-  - cd tests && npm test
+  - npm test
