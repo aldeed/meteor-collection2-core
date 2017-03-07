@@ -6,10 +6,10 @@
     "test:watch": "METEOR_PACKAGE_DIRS=../package TEST_WATCH=1 meteor test --driver-package dispatch:mocha-phantomjs"
   },
   "dependencies": {
-    "babel-polyfill": "6.20.0",
-    "babel-runtime": "6.20.0",
+    "babel-polyfill": "6.23.0",
+    "babel-runtime": "6.23.0",
     "expect": "1.20.2",
-    "meteor-node-stubs": "0.2.4",
-    "simpl-schema": "0.0.4"
+    "meteor-node-stubs": "0.2.5",
+    "simpl-schema": "0.2.3"
   }
 }
