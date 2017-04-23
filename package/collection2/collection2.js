@@ -358,7 +358,7 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
   for (var prop in doc) {
     // We omit prototype properties when cloning because they will not be valid
     // and mongo omits them when saving to the database anyway.
-    if (doc.hasOwnProperty(prop)) {
+    if (Object.prototype.hasOwnProperty.call(doc, prop)) {
       docToValidate[prop] = doc[prop];
     }
   }

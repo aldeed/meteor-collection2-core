@@ -29,6 +29,24 @@ describe('collection2', function () {
     expect(mc.simpleSchema() instanceof SimpleSchema).toBe(true);
   });
 
+  it('handles prototype-less objects', function (done) {
+      const prototypelessTest = new Mongo.Collection('prototypelessTest');
+
+      prototypelessTest.attachSchema(new SimpleSchema({
+        foo: {
+          type: String
+        }
+      }));
+
+      const prototypelessObject = Object.create(null);
+      prototypelessObject.foo = 'bar'
+
+      prototypelessTest.insert(prototypelessObject, (error, newId) => {
+        expect(!!error).toBe(false);
+        done();
+      });
+    });
+
   if (Meteor.isServer) {
     // https://github.com/aldeed/meteor-collection2/issues/243
     it('upsert runs autoValue only once', function (done) {
