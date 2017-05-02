@@ -1,5 +1,9 @@
 ## Change Log
 
+### 2.0.1
+
+Fix error when validating an object with no prototype (thanks @jasonphillips)
+
 ### 2.0.0
 
 Requires Meteor 1.3+ and requires you to install and use the [Node SimpleSchema package](https://github.com/aldeed/node-simple-schema).

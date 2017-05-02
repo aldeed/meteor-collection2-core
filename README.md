@@ -609,14 +609,14 @@ and then submit a pull request.
 
 ```bash
 $ cd tests
-$ npm i && npm test
+$ meteor npm i && npm test
 ```
 
 ### Running Tests in Watch Mode
 
 ```bash
 $ cd tests
-$ npm i && npm run test:watch
+$ meteor npm i && npm run test:watch
 ```
 
 ### Major Contributors
