@@ -128,56 +128,82 @@ export default function addMultiTests() {
       expect(c._validators.update.deny.length, 2);
     });
 
-    it('insert selects the correct schema', function () {
-      const productId = products.insert({
-        title: 'Product one'
-      }, { selector: { type: 'simple' } });
-
-      const productVariantId = products.insert({
-        title: 'Product variant one',
-        createdAt: new Date()
-      }, { selector: { type: 'variant' } });
-
-      const product = products.findOne(productId);
-      const productVariant = products.findOne(productVariantId);
-
-      // we should receive new docs with correct property set for each type of doc
-      expect(product.description).toBe('This is a simple product.');
-      expect(product.price).toBe(undefined);
-      expect(productVariant.description).toBe(undefined);
-      expect(productVariant.price).toBe(5)
-    });
-
-    it('inserts doc correctly with selector passed via doc and via <option>', function () {
+    it('inserts doc correctly with selector passed via doc', function (done) {
       const productId = products.insert({
         title: 'Product one',
         type: 'simple' // selector in doc
+      }, () => {
+        const product = products.findOne(productId);
+        expect(product.description).toBe('This is a simple product.');
+        expect(product.price).toBe(undefined);
+
+        const productId3 = products.insert({
+          title: 'Product three',
+          createdAt: new Date(),
+          type: 'variant' // other selector in doc
+        }, () => {
+          const product3 = products.findOne(productId3);
+          expect(product3.description).toBe(undefined);
+          expect(product3.price).toBe(5);
+          done();
+        });
       });
-
-      const productId2 = products.insert({
-        title: 'Product two'
-      }, { selector: { type: 'simple' } }); // selector in option
-
-      const productId3 = products.insert({
-        title: 'Product three',
-        createdAt: new Date(),
-        type: 'variant' // other selector in doc
-      });
-
-      const product = products.findOne(productId);
-      const product2 = products.findOne(productId2);
-      const product3 = products.findOne(productId3);
-
-      // we should receive new docs with correct property set for each type of doc
-      expect(product.description).toBe('This is a simple product.');
-      expect(product.price).toBe(undefined);
-      expect(product2.description).toBe('This is a simple product.');
-      expect(product2.price).toBe(undefined);
-      expect(product3.description).toBe(undefined);
-      expect(product3.price).toBe(5);
     });
 
     if (Meteor.isServer) {
+      // Passing selector in options works only on the server because
+      // client options are not sent to the server and made availabe in
+      // the deny functions, where we call .simpleSchema()
+      //
+      // Also synchronous only works on server
+      it('insert selects the correct schema', function () {
+        const productId = products.insert({
+          title: 'Product one'
+        }, { selector: { type: 'simple' } });
+
+        const productVariantId = products.insert({
+          title: 'Product variant one',
+          createdAt: new Date()
+        }, { selector: { type: 'variant' } });
+
+        const product = products.findOne(productId);
+        const productVariant = products.findOne(productVariantId);
+
+        // we should receive new docs with correct property set for each type of doc
+        expect(product.description).toBe('This is a simple product.');
+        expect(product.price).toBe(undefined);
+        expect(productVariant.description).toBe(undefined);
+        expect(productVariant.price).toBe(5)
+      });
+
+      it('inserts doc correctly with selector passed via doc and via <option>', function () {
+        const productId = products.insert({
+          title: 'Product one',
+          type: 'simple' // selector in doc
+        });
+        const product = products.findOne(productId);
+        expect(product.description).toBe('This is a simple product.');
+        expect(product.price).toBe(undefined);
+
+        const productId2 = products.insert({
+          title: 'Product two'
+        }, { selector: { type: 'simple' } }); // selector in option
+
+        const product2 = products.findOne(productId2);
+        expect(product2.description).toBe('This is a simple product.');
+        expect(product2.price).toBe(undefined);
+
+        const productId3 = products.insert({
+          title: 'Product three',
+          createdAt: new Date(),
+          type: 'variant' // other selector in doc
+        });
+
+        const product3 = products.findOne(productId3);
+        expect(product3.description).toBe(undefined);
+        expect(product3.price).toBe(5);
+      });
+
       it('upsert selects the correct schema', function () {
         products.insert({ title: 'Product one' }, { selector: { type: 'simple' } });
 
@@ -298,30 +324,30 @@ export default function addMultiTests() {
         expect(product.description).toBe('This is a modified product three.');
         expect(product.price).toBe(undefined);
       });
-    }
 
-    it('allows changing schema on update operation', function () {
-      const productId = products.insert({
-        title: 'Product one'
-      }, { selector: { type: 'simple' } });
+      it('allows changing schema on update operation', function () {
+        const productId = products.insert({
+          title: 'Product one'
+        }, { selector: { type: 'simple' } });
 
-      let product = products.findOne(productId);
-      products.update({ _id: product._id }, {
-        $set: {
-          price: 10, // validating against new schema
-          type: 'variant'
-        }
+        let product = products.findOne(productId);
+        products.update({ _id: product._id }, {
+          $set: {
+            price: 10, // validating against new schema
+            type: 'variant'
+          }
+        });
+
+        products.update({ _id: product._id }, {
+          $unset: { description: '' }
+        }, { selector: { type: 'variant' }, validate: false });
+        product = products.findOne(productId);
+
+        expect(product.description).toBe(undefined);
+        expect(product.price).toBe(10);
+        expect(product.type).toBe('variant');
       });
-
-      products.update({ _id: product._id }, {
-        $unset: { description: '' }
-      }, { selector: { type: 'variant' }, validate: false });
-      product = products.findOne(productId);
-
-      expect(product.description).toBe(undefined);
-      expect(product.price).toBe(10);
-      expect(product.type).toBe('variant');
-    });
+    }
 
     it('returns the correct schema on `MyCollection.simpleSchema(object)`', function () {
       const schema = products.simpleSchema({
@@ -331,57 +357,62 @@ export default function addMultiTests() {
       expect(schema._schema.type.label).toBe('Product Variant Type');
     });
 
-    it('insert selects the correct extended schema', function () {
-      const productId = extendedProducts.insert({
-        title: 'Extended Product one'
-      }, { selector: { type: 'simple' } });
+    if (Meteor.isServer) {
+      // Passing selector in options works only on the server because
+      // client options are not sent to the server and made availabe in
+      // the deny functions, where we call .simpleSchema()
+      it('insert selects the correct extended schema', function () {
+        const productId = extendedProducts.insert({
+          title: 'Extended Product one'
+        }, { selector: { type: 'simple' } });
 
-      const productVariantId = extendedProducts.insert({
-        title: 'Product variant one',
-        createdAt: new Date()
-      }, { selector: { type: 'variant' } });
+        const productVariantId = extendedProducts.insert({
+          title: 'Product variant one',
+          createdAt: new Date()
+        }, { selector: { type: 'variant' } });
 
-      const extendedProduct = extendedProducts.findOne(productId);
-      const extendedProductVariant = extendedProducts.findOne(productVariantId);
+        const extendedProduct = extendedProducts.findOne(productId);
+        const extendedProductVariant = extendedProducts.findOne(productVariantId);
 
-      // we should receive new docs with correct property set for each type of doc
-      expect(extendedProduct.description).toBe('This is a simple product.');
-      expect(extendedProduct.title).toBe('Extended Product one');
-      expect(extendedProduct.barcode).toBe('ABC123');
-      expect(extendedProduct.price).toBe(undefined);
-      expect(extendedProductVariant.description).toBe(undefined);
-      expect(extendedProductVariant.price).toBe(5);
-      expect(extendedProductVariant.barcode).toBe(undefined);
-    });
+        // we should receive new docs with correct property set for each type of doc
+        expect(extendedProduct.description).toBe('This is a simple product.');
+        expect(extendedProduct.title).toBe('Extended Product one');
+        expect(extendedProduct.barcode).toBe('ABC123');
+        expect(extendedProduct.price).toBe(undefined);
+        expect(extendedProductVariant.description).toBe(undefined);
+        expect(extendedProductVariant.price).toBe(5);
+        expect(extendedProductVariant.barcode).toBe(undefined);
+      });
 
-    it('update selects the correct extended schema', function () {
-      const productId = extendedProducts.insert({
-        title: 'Product one'
-      }, { selector: { type: 'simple' } });
+      it('update selects the correct extended schema', function () {
+        const productId = extendedProducts.insert({
+          title: 'Product one'
+        }, { selector: { type: 'simple' } });
 
-      const productVariantId = extendedProducts.insert({
-        title: 'Product variant one',
-        createdAt: new Date()
-      }, { selector: { type: 'variant' } });
+        const productVariantId = extendedProducts.insert({
+          title: 'Product variant one',
+          createdAt: new Date()
+        }, { selector: { type: 'variant' } });
 
-      extendedProducts.update(productId, {
-        $set: { barcode: 'XYZ456' }
-      }, { selector: { type: 'simple' } });
+        extendedProducts.update(productId, {
+          $set: { barcode: 'XYZ456' }
+        }, { selector: { type: 'simple' } });
 
-      extendedProducts.update(productVariantId, {
-        $set: { title: 'New productVariant one' }
-      }, { selector: { type: 'simple' } });
+        extendedProducts.update(productVariantId, {
+          $set: { title: 'New productVariant one' }
+        }, { selector: { type: 'simple' } });
 
-      const product = extendedProducts.findOne(productId);
-      const productVariant = extendedProducts.findOne(productVariantId);
+        const product = extendedProducts.findOne(productId);
+        const productVariant = extendedProducts.findOne(productVariantId);
 
-      // we should receive new docs with the same properties as before update
-      expect(product.description).toBe('This is a simple product.');
-      expect(product.barcode).toBe('XYZ456')
-      expect(product.price).toBe(undefined);
-      expect(productVariant.description).toBe(undefined);
-      expect(productVariant.price).toBe(5);
-      expect(productVariant.barcode).toBe(undefined);
-    });
+        // we should receive new docs with the same properties as before update
+        expect(product.description).toBe('This is a simple product.');
+        expect(product.barcode).toBe('XYZ456')
+        expect(product.price).toBe(undefined);
+        expect(productVariant.description).toBe(undefined);
+        expect(productVariant.price).toBe(5);
+        expect(productVariant.barcode).toBe(undefined);
+      });
+    }
   });
 }

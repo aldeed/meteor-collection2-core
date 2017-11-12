@@ -188,7 +188,7 @@ _.each(['insert', 'update'], function(methodName) {
         self,
         methodName,
         args,
-        true, // getAutoValues
+        Meteor.isServer || self._connection === null, // getAutoValues
         userId,
         Meteor.isServer // isFromTrustedCode
       );
