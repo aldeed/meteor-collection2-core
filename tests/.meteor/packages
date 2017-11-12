@@ -23,6 +23,5 @@ insecure@1.0.7                # Allow all DB writes from clients (for prototypin
 
 underscore@1.0.10
 aldeed:collection2-core
-dispatch:mocha-browser
-dispatch:mocha
 dynamic-import
+meteortesting:mocha

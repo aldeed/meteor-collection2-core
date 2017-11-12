@@ -2,9 +2,9 @@
   "name": "tests",
   "private": true,
   "scripts": {
-    "test": "METEOR_PACKAGE_DIRS=../package TEST_BROWSER_DRIVER=chrome meteor test --once --driver-package dispatch:mocha",
-    "test:watch": "METEOR_PACKAGE_DIRS=../package TEST_BROWSER_DRIVER=chrome TEST_WATCH=1 meteor test --driver-package dispatch:mocha",
-    "test:watch:browser": "METEOR_PACKAGE_DIRS=../package TEST_WATCH=1 meteor test --driver-package dispatch:mocha"
+    "test": "METEOR_PACKAGE_DIRS=../package TEST_BROWSER_DRIVER=chrome meteor test --once --driver-package meteortesting:mocha",
+    "test:watch": "METEOR_PACKAGE_DIRS=../package TEST_BROWSER_DRIVER=chrome TEST_WATCH=1 meteor test --driver-package meteortesting:mocha",
+    "test:watch:browser": "METEOR_PACKAGE_DIRS=../package TEST_WATCH=1 meteor test --driver-package meteortesting:mocha"
   },
   "dependencies": {
     "babel-polyfill": "6.26.0",
