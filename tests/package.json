@@ -15,6 +15,6 @@
   "devDependencies": {
     "chromedriver": "2.33.2",
     "expect": "1.20.2",
-    "selenium-webdriver": "3.0.0-beta-2"
+    "selenium-webdriver": "^3.6.0"
   }
 }
