@@ -1,6 +1,6 @@
 ## Change Log
 
-### vNext
+### 2.0.3
 
 Add support for validating an upsert where the query has $and.
 
