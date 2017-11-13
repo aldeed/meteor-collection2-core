@@ -124,6 +124,7 @@ export default function addBooksTests() {
 
       function getUpdateCallback(done) {
         return (error, result) => {
+          if (error) console.error(error);
           expect(!!error).toBe(false);
           expect(result).toBe(1);
 
@@ -177,6 +178,23 @@ export default function addBooksTests() {
         books.update({
           title: "Ulysses",
           author: "James Joyce"
+        }, {
+          $set: {
+            title: "Ulysses",
+            author: "James Joyce",
+            copies: 1
+          }
+        }, {
+          upsert: true
+        }, getUpdateCallback(done));
+      });
+
+      it('upsert as update with $and', function (done) {
+        books.update({
+          $and: [
+           { title: "Ulysses" },
+           { author: "James Joyce" },
+          ],
         }, {
           $set: {
             title: "Ulysses",

@@ -1,5 +1,9 @@
 ## Change Log
 
+### vNext
+
+Add support for validating an upsert where the query has $and.
+
 ### 2.0.2
 
 Fix issue where autoValue function was running twice on the client for client-initiated inserts and updates. This led to issues with autoValues not being added correctly, or inserts or updates not succeeding.

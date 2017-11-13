@@ -371,7 +371,18 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
   // probably isn't any better way right now.
   if (Meteor.isServer && isUpsert && _.isObject(selector)) {
     var set = docToValidate.$set || {};
-    docToValidate.$set = _.clone(selector);
+
+    // If selector uses $and format, convert to plain object selector
+    if (Array.isArray(selector.$and)) {
+      const plainSelector = {};
+      selector.$and.forEach(sel => {
+        _.extend(plainSelector, sel);
+      });
+      docToValidate.$set = plainSelector;
+    } else {
+      docToValidate.$set = _.clone(selector);
+    }
+
     if (!schemaAllowsId) delete docToValidate.$set._id;
     _.extend(docToValidate.$set, set);
   }
