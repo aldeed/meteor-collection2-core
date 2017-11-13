@@ -1,5 +1,9 @@
 ## Change Log
 
+### 2.0.2
+
+Fix issue where autoValue function was running twice on the client for client-initiated inserts and updates. This led to issues with autoValues not being added correctly, or inserts or updates not succeeding.
+
 ### 2.0.1
 
 Fix error when validating an object with no prototype (thanks @jasonphillips)
