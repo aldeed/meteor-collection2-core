@@ -40,8 +40,8 @@ livedata@1.0.18
 logging@1.1.19
 meteor@1.8.1
 meteor-base@1.2.0
-meteortesting:browser-tests@0.1.1
-meteortesting:mocha@0.4.4
+meteortesting:browser-tests@0.1.2
+meteortesting:mocha@0.5.0
 minifier-css@1.2.16
 minifier-js@2.2.1
 minimongo@1.4.1
