@@ -10,6 +10,7 @@ const contextCheckSchema = new SimpleSchema({
   context: {
     type: Object,
     optional: true,
+    defaultValue: {},
   },
   'context.userId': {
     type: String,
@@ -73,6 +74,7 @@ export default function addContextTests() {
       // make sure docId works with `_id` direct, too
       contextCheck.update(testId, {
         $set: {
+          context: {},
           foo: "bar"
         }
       }, callback1);
@@ -92,6 +94,7 @@ export default function addContextTests() {
         _id: testId
       }, {
         $set: {
+          context: {},
           foo: "bar"
         }
       }, callback2);

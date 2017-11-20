@@ -1,5 +1,9 @@
 ## Change Log
 
+### 2.0.4
+
+Support SimpleSchema 1.0.0+
+
 ### 2.0.3
 
 Add support for validating an upsert where the query has $and.
