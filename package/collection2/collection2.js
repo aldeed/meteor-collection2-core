@@ -59,7 +59,7 @@ Mongo.Collection.prototype.attachSchema = function c2AttachSchema(ss, options) {
       obj._c2._simpleSchemas = obj._c2._simpleSchemas || [];
 
       // Loop through existing schemas with selectors
-      obj._c2._simpleSchemas.forEach(function (schema, index) {
+      obj._c2._simpleSchemas.forEach((schema, index) => {
         // if we find a schema with an identical selector, save it's index
         if(_.isEqual(schema.selector, selector)) {
           schemaIndex = index;
@@ -111,7 +111,7 @@ Mongo.Collection.prototype.attachSchema = function c2AttachSchema(ss, options) {
   Collection2.emit('schema.attached', self, ss, options);
 };
 
-_.each([Mongo.Collection, LocalCollection], function (obj) {
+[Mongo.Collection, LocalCollection].forEach((obj) => {
   /**
    * simpleSchema
    * @description function detect the correct schema by given params. If it
@@ -165,7 +165,7 @@ _.each([Mongo.Collection, LocalCollection], function (obj) {
 });
 
 // Wrap DB write operation methods
-_.each(['insert', 'update'], function(methodName) {
+['insert', 'update'].forEach((methodName) => {
   var _super = Mongo.Collection.prototype[methodName];
   Mongo.Collection.prototype[methodName] = function() {
     var self = this, options,
@@ -443,7 +443,7 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
 
     return args;
   } else {
-    error = getErrorObject(validationContext);
+    error = getErrorObject(validationContext, `in ${self._name} ${type}`);
     if (callback) {
       // insert/update/upsert pass `false` when there's an error, so we do that
       callback(error, false);
@@ -453,15 +453,16 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
   }
 }
 
-function getErrorObject(context) {
-  var message;
-  var invalidKeys = (typeof context.validationErrors === 'function') ? context.validationErrors() : context.invalidKeys();
+function getErrorObject(context, appendToMessage = '') {
+  let message;
+  const invalidKeys = (typeof context.validationErrors === 'function') ? context.validationErrors() : context.invalidKeys();
   if (invalidKeys.length) {
     message = context.keyErrorMessage(invalidKeys[0].name);
   } else {
     message = "Failed validation";
   }
-  var error = new Error(message);
+  message = `${message} ${appendToMessage}`.trim();
+  const error = new Error(message);
   error.invalidKeys = invalidKeys;
   error.validationContext = context;
   // If on the server, we add a sanitized error, too, in case we're

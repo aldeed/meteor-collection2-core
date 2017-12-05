@@ -1,5 +1,9 @@
 ## Change Log
 
+### vNext
+
+The error thrown or passed to the callback when an operation fails due to the object being invalid now has a message that includes the collection name and the type of operation. This helps more quickly see where errors originated in cases where multiple operations could have caused the error.
+
 ### 2.0.4
 
 Support SimpleSchema 1.0.0+
