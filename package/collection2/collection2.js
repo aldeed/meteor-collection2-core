@@ -457,7 +457,16 @@ function getErrorObject(context, appendToMessage = '') {
   let message;
   const invalidKeys = (typeof context.validationErrors === 'function') ? context.validationErrors() : context.invalidKeys();
   if (invalidKeys.length) {
-    message = context.keyErrorMessage(invalidKeys[0].name);
+    const firstErrorKey = invalidKeys[0].name;
+    const firstErrorMessage = context.keyErrorMessage(firstErrorKey);
+
+    // If the error is in a nested key, add the full key to the error message
+    // to be more helpful.
+    if (firstErrorKey.indexOf('.') === -1) {
+      message = firstErrorMessage;
+    } else {
+      message = `${firstErrorMessage} (${firstErrorKey})`;
+    }
   } else {
     message = "Failed validation";
   }
