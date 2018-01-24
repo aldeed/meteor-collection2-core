@@ -11,6 +11,14 @@ const SimpleSchema = require('simpl-schema').default;
 // Exported only for listening to events
 const Collection2 = new EventEmitter();
 
+const defaultCleanOptions = {
+  filter: true,
+  autoConvert: true,
+  removeEmptyStrings: true,
+  trimStrings: true,
+  removeNullsFromArrays: false,
+};
+
 /**
  * Mongo.Collection.prototype.attachSchema
  * @param {SimpleSchema|Object} ss - SimpleSchema instance or a schema definition object
@@ -318,38 +326,43 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
     delete doc._id;
   }
 
-  function doClean(docToClean, getAutoValues, filter, autoConvert, removeEmptyStrings, trimStrings) {
-    // Clean the doc/modifier in place
-    schema.clean(docToClean, {
-      mutate: true,
-      filter: filter,
-      autoConvert: autoConvert,
-      getAutoValues: getAutoValues,
-      isModifier: (type !== "insert"),
-      removeEmptyStrings: removeEmptyStrings,
-      trimStrings: trimStrings,
-      extendAutoValueContext: _.extend({
-        isInsert: (type === "insert"),
-        isUpdate: (type === "update" && options.upsert !== true),
-        isUpsert: isUpsert,
-        userId: userId,
-        isFromTrustedCode: isFromTrustedCode,
-        docId: docId,
-        isLocalCollection: isLocalCollection
-      }, options.extendAutoValueContext || {})
-    });
-  }
+  const autoValueContext = {
+    isInsert: (type === "insert"),
+    isUpdate: (type === "update" && options.upsert !== true),
+    isUpsert,
+    userId,
+    isFromTrustedCode,
+    docId,
+    isLocalCollection
+  };
+
+  const extendAutoValueContext = {
+    ...((schema._cleanOptions || {}).extendAutoValueContext || {}),
+    ...autoValueContext,
+    ...options.extendAutoValueContext,
+  };
+
+  const cleanOptionsForThisOperation = {};
+  ["autoConvert", "filter", "removeEmptyStrings", "removeNullsFromArrays", "trimStrings"].forEach(prop => {
+    if (typeof options[prop] === "boolean") {
+      cleanOptionsForThisOperation[prop] = options[prop];
+    }
+  });
 
   // Preliminary cleaning on both client and server. On the server and for local
   // collections, automatic values will also be set at this point.
-  doClean(
-    doc,
-    getAutoValues,
-    options.filter !== false,
-    options.autoConvert !== false,
-    options.removeEmptyStrings !== false,
-    options.trimStrings !== false
-  );
+  schema.clean(doc, {
+    mutate: true, // Clean the doc/modifier in place
+    isModifier: (type !== "insert"),
+    // Start with some Collection2 defaults, which will usually be overwritten
+    ...defaultCleanOptions,
+    // The extend with the schema-level defaults (from SimpleSchema constructor options)
+    ...(schema._cleanOptions || {}),
+    // Finally, options for this specific operation should take precedance
+    ...cleanOptionsForThisOperation,
+    extendAutoValueContext, // This was extended separately above
+    getAutoValues, // Force this override
+  });
 
   // We clone before validating because in some cases we need to adjust the
   // object a bit before validating it. If we adjusted `doc` itself, our
@@ -392,7 +405,17 @@ function doValidate(type, args, getAutoValues, userId, isFromTrustedCode) {
   // we will add them to docToValidate for validation purposes only.
   // This is because we want all actual values generated on the server.
   if (Meteor.isClient && !isLocalCollection) {
-    doClean(docToValidate, true, false, false, false, false);
+    schema.clean(docToValidate, {
+      autoConvert: false,
+      extendAutoValueContext,
+      filter: false,
+      getAutoValues: true,
+      isModifier: (type !== "insert"),
+      mutate: true, // Clean the doc/modifier in place
+      removeEmptyStrings: false,
+      removeNullsFromArrays: false,
+      trimStrings: false,
+    });
   }
 
   // XXX Maybe move this into SimpleSchema
