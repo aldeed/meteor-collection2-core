@@ -1,5 +1,9 @@
 ## Change Log
 
+### 2.1.1
+
+If you pass default clean options to a schema when creating it (see https://github.com/aldeed/simple-schema-js#set-default-cleaning-options), they are now respected rather than being overridden by Collection2 defaults.
+
 ### 2.1.0
 
 The error thrown or passed to the callback when an operation fails due to the object being invalid now has a message that includes the collection name, the type of operation, and the full key if it's deeply nested. This helps more quickly see where errors originated in cases where multiple operations could have caused the error.
